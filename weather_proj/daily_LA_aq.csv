@@ -1,0 +1,3 @@
+DateObserved,HourObserved,LocalTimeZone,ReportingArea,StateCode,Latitude,Longitude,ParameterName,AQI,CategoryNumber,CategoryName
+2025-12-01,17,PST,S Central LA CO,CA,33.9288,-118.2108,O3,32,1,Good
+2025-12-01,17,PST,S Central LA CO,CA,33.9288,-118.2108,PM2.5,60,2,Moderate
