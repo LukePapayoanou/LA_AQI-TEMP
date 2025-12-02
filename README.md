@@ -6,4 +6,4 @@ Daily Los Angeles Air quality and temperature data and visualizations
 
 Temperature (Los Angeles):
 ![Daily Temperature](weather_proj/plots/temp_plots):
-![Daily AQI](weather_proj/plots/aqi
+![Daily AQI](weather_proj/plots/aqi):
