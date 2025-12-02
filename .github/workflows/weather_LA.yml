@@ -1,0 +1,90 @@
+
+name: Daily Weather & Plots
+
+on:
+  schedule:
+    - cron: '0 2 * * *'
+  workflow_dispatch:  # allow manual runs from the Actions tab
+
+permissions:
+  contents: write  # needed to push changes with GITHUB_TOKEN
+
+env:
+  # Ensure R and any date handling use New York time
+  TZ: America/New_York
+  R_ENVIRON_USER: ~/.Renviron
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up R
+        uses: r-lib/actions/setup-r@v2
+
+      - name: Install R package dependencies
+        uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          # Add the packages your scripts need. Adjust as necessary.
+          packages: |
+            any::rvest
+            any::tidyr
+            any::readr
+            any::xml2
+            any::jsonlite
+            any::dplyr
+            any::lubridate
+            any::ggplot2
+
+      - name: Show session info (debugging aid)
+        run: |
+          Rscript -e 'sessionInfo()'
+
+      # --- Run your pipeline scripts in order ---
+      - name: Run weather gather
+        run: |
+          Rscript weather_gather.R
+
+      - name: Clean/transform weather
+        run: |
+          Rscript clean_weather.R
+
+      - name: Build Temp Plot
+        run: |
+          Rscript BuildTempGraph.R
+
+      - name: Build AQI Plot
+        run: |
+          Rscript BuildAQIGraph.R
+
+      # Optional: verify plots exist (fail fast if not created)
+      - name: Verify plot outputs exist
+        run: |
+          test -f weather_proj/plots/temp_plot.png
+          test -f weather_proj/plots/aqi_plot.png
+
+      # Option A: auto-commit all changes (CSV updates + plots)
+     # - name: Commit & push changes
+     #   uses: stefanzweifel/git-auto-commit-action@v5
+     #   with:
+     #     commit_message: "Daily update: data + plots"
+     #     branch: main
+     #     file_pattern: |
+     #       weather_proj/*.csv
+     #       weather_proj/plots/*.png
+     #       README.md
+
+      # If you prefer git commands instead of the action, comment out the step above
+      # and uncomment the following:
+       - name: Commit via git
+         run: |
+           git config user.name "github-actions[bot]"
+           git config user.email "github-actions[bot]@users.noreply.github.com"
+           git add weather_proj/*.csv weather_proj/plots/*.png README.md || true
+           git commit -m "Daily update: data + plots" || echo "No changes to commit"
+     
