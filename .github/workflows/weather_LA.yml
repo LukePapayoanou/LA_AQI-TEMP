@@ -81,10 +81,10 @@ jobs:
 
       # If you prefer git commands instead of the action, comment out the step above
       # and uncomment the following:
-       - name: Commit via git
-         run: |
-           git config user.name "github-actions[bot]"
-           git config user.email "github-actions[bot]@users.noreply.github.com"
-           git add weather_proj/*.csv weather_proj/plots/*.png README.md || true
-           git commit -m "Daily update: data + plots" || echo "No changes to commit"
+      - name: Commit via git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add weather_proj/*.csv weather_proj/plots/*.png README.md || true
+          git commit -m "Daily update: data + plots" || echo "No changes to commit"
      
