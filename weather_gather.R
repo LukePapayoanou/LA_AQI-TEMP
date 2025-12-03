@@ -5,59 +5,52 @@ library(jsonlite)
 library(dplyr)
 library(readr)
 
+# Increase timeout for slow API responses
+options(timeout = 120)
 
-url <- "https://api.weather.gov/stations/STFC1/observations/latest"
-temp <- fromJSON(url)
-temp <- temp$properties$temperature
-temp <- temp |> data.frame()
-
-
-
-library(jsonlite)
-
-# --- Safe CSV read ---
-safe_read_csv <- function(url) {
-  tryCatch(
-    {
+# --- Safe CSV read with retries ---
+safe_read_csv <- function(url, retries = 3) {
+  attempt <- 1
+  while (attempt <= retries) {
+    tryCatch({
       df <- read.csv(url)
       if (is.null(df) || nrow(df) == 0) {
         message("AirNow returned empty data.")
         return(NULL)
       }
       return(df)
-    },
-    error = function(e) {
-      message("Error reading AirNow CSV: ", e$message)
-      return(NULL)
-    }
-  )
+    }, error = function(e) {
+      message("Attempt ", attempt, " failed: ", e$message)
+      attempt <<- attempt + 1
+      Sys.sleep(5)  # wait 5 seconds before retrying
+      if (attempt > retries) return(NULL)
+    })
+  }
 }
 
 # --- Safe JSON read ---
 safe_fromJSON <- function(url) {
-  tryCatch(
-    {
-      data <- jsonlite::fromJSON(url)
-      if (is.null(data)) {
-        message("Weather.gov returned NULL JSON.")
-        return(NULL)
-      }
-      return(data)
-    },
-    error = function(e) {
-      message("Error reading Weather.gov JSON: ", e$message)
+  tryCatch({
+    data <- jsonlite::fromJSON(url)
+    if (is.null(data)) {
+      message("Weather.gov returned NULL JSON.")
       return(NULL)
     }
-  )
+    return(data)
+  }, error = function(e) {
+    message("Error reading Weather.gov JSON: ", e$message)
+    return(NULL)
+  })
 }
 
 # -----------------------------
 # 1. GET AIRNOW AQ DATA SAFELY
 # -----------------------------
-aq_url <- paste0("https://www.airnowapi.org/aq/observation/zipCode/current/?format=text/csv&zipCode=90002&distance=25&API_KEY=BD7D054A-5BA5-4637-96D6-A7110E959E8C")
+aq_url <- paste0(
+  "https://www.airnowapi.org/aq/observation/zipCode/current/?format=text/csv&zipCode=90002&distance=25&API_KEY=BD7D054A-5BA5-4637-96D6-A7110E959E8C"
+)
 
 aq <- safe_read_csv(aq_url)
-
 
 # -----------------------------
 # 2. GET WEATHER TEMPERATURE SAFELY
@@ -78,19 +71,32 @@ if (!is.null(raw_temp) &&
   temp <- data.frame(temperature = NA)
 }
 
-dir.create("weather_proj", showWarnings = F)
+# -----------------------------
+# 3. WRITE CSV FILES SAFELY
+# -----------------------------
+dir.create("weather_proj", showWarnings = FALSE)
 
 temp_file <- "weather_proj/daily_LA_temp.csv"
 aq_file <- "weather_proj/daily_LA_aq.csv"
 
-if(file.exists(temp_file)){
-  write_csv(temp, temp_file, append = T)
+# Temperature
+if (!is.null(temp)) {
+  if (file.exists(temp_file)) {
+    write_csv(temp, temp_file, append = TRUE)
+  } else {
+    write_csv(temp, temp_file)
+  }
 } else {
-  write_csv(temp, temp_file)
+  message("Temperature data is NULL, skipping write.")
 }
 
-if(file.exists(aq_file)){
-  write_csv(aq, aq_file, append = T)
+# AirNow AQ
+if (!is.null(aq)) {
+  if (file.exists(aq_file)) {
+    write_csv(aq, aq_file, append = TRUE)
+  } else {
+    write_csv(aq, aq_file)
+  }
 } else {
-  write_csv(aq, aq_file)
+  message("AirNow data is NULL, skipping write.")
 }
