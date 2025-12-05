@@ -32,7 +32,7 @@ clean_temp_aq <- left_join(aq, temp_today, by = "DateObserved")
 
 # Convert Celsius → Fahrenheit
 clean_temp_aq <- clean_temp_aq %>%
-  mutate(temp_f = (temperature * 9/5) + 32)
+  mutate(temp = (temperature * 9/5) + 32)
 
 # -------------------------
 # 5. Save cleaned file
