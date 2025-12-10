@@ -1,6 +1,7 @@
 # LA_AQI-TEMP
-Daily Los Angeles Air quality and temperature data and visualizations
+Daily Los Angeles Air quality and temperature data and visualizations.
 
+The sources for my data are [airnowapi](https://docs.airnowapi.org/)
 
 ## Latest Daily Visualizations
 
