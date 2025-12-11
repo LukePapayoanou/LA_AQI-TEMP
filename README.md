@@ -3,6 +3,10 @@ Daily Los Angeles Air quality and temperature data and visualizations.
 
 The sources for my data are [airnowapi](https://docs.airnowapi.org/) and [api.weather.gov](https://api.weather.gov/)
 
+## Dashboard
+
+A live dashboard can be found [here](https://luke-papayoanou.shinyapps.io/weather_shiny/)
+
 ## Latest Daily Visualizations
 
 ![Daily Temperature](weather_proj/plots/temp_plot.png)
