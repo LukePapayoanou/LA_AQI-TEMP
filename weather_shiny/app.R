@@ -22,7 +22,7 @@ ui <- fluidPage(
 server <- function(input, output, session) {
   
   data <- reactive({
-    read.csv("..weather_proj/daily_clean_aqTemp.csv") |>
+    read.csv("../weather_proj/daily_clean_aqTemp.csv") |>
       mutate(Date = as.Date(DateObserved))
   })
   
