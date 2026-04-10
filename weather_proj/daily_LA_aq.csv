@@ -249,3 +249,5 @@ DateObserved,HourObserved,LocalTimeZone,ReportingArea,StateCode,Latitude,Longitu
 2026-04-07,20,PST,S Central LA CO,CA,33.9288,-118.2108,PM2.5,55,2,Moderate
 2026-04-08,20,PST,S Central LA CO,CA,33.9288,-118.2108,O3,39,1,Good
 2026-04-08,20,PST,S Central LA CO,CA,33.9288,-118.2108,PM2.5,59,2,Moderate
+2026-04-09,20,PST,S Central LA CO,CA,33.9288,-118.2108,O3,31,1,Good
+2026-04-09,20,PST,S Central LA CO,CA,33.9288,-118.2108,PM2.5,54,2,Moderate
